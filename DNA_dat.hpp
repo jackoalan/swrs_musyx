@@ -18,7 +18,7 @@ struct SR2_DAT : public Athena::io::DNA<Athena::BigEndian>
     Value<atUint64> footOff;
     Value<atUint64> footSz;
 
-    Seek<sizeof(footOff), Athena::Begin> footSeek;
+    Seek<DNA_COUNT(footOff), Athena::Begin> footSeek;
 
     struct FootEntry : public Athena::io::DNA<Athena::BigEndian>
     {
@@ -27,7 +27,7 @@ struct SR2_DAT : public Athena::io::DNA<Athena::BigEndian>
         String<32> name;
     };
 
-    Vector<FootEntry, sizeof(footSz / 64)> footEntries;
+    Vector<FootEntry, DNA_COUNT(footSz / 64)> footEntries;
 };
 
 struct SR3_DAT : public Athena::io::DNA<Athena::BigEndian>
@@ -36,7 +36,7 @@ struct SR3_DAT : public Athena::io::DNA<Athena::BigEndian>
     Value<atUint64> footOff;
     Value<atUint64> footSz;
 
-    Seek<sizeof(footOff), Athena::Begin> footSeek;
+    Seek<DNA_COUNT(footOff), Athena::Begin> footSeek;
 
     struct FootEntry : public Athena::io::DNA<Athena::BigEndian>
     {
@@ -45,14 +45,14 @@ struct SR3_DAT : public Athena::io::DNA<Athena::BigEndian>
         String<128> name;
     };
 
-    Vector<FootEntry, sizeof(footSz / 160)> footEntries;
+    Vector<FootEntry, DNA_COUNT(footSz / 160)> footEntries;
 };
 
 struct GroupOffsets : public Athena::io::DNA<Athena::BigEndian>
 {
     DECL_DNA
     Value<atUint32> count;
-    Vector<atUint32, sizeof(count)> elements;
+    Vector<atUint32, DNA_COUNT(count)> elements;
 };
 
 struct GroupHead : public Athena::io::DNA<Athena::BigEndian>

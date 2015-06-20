@@ -1,9 +1,16 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include "DNA_dat.hpp"
 #include <Athena/FileReader.hpp>
 #include <Athena/MemoryReader.hpp>
 #include <memory>
+
+#if _WIN32
+#include <direct.h>
+#define mkdir(dir, mode) _mkdir(dir)
+#define snprintf _snprintf
+#endif
 
 typedef unsigned char TADPCMFrame[8];
 
@@ -44,7 +51,8 @@ struct SamplerChunk {
 };
 
 static void parseAudData(const FootEntryCommon& entry,
-                         Athena::io::FileReader& datReader)
+                         Athena::io::FileReader& datReader,
+                         const char* dirRoot)
 {
     datReader.seek(entry.offset, Athena::Begin);
     std::unique_ptr<atUint8[]> audBuf(new atUint8[entry.length]);
@@ -59,7 +67,7 @@ static void parseAudData(const FootEntryCommon& entry,
     GroupOffsets groupOffs;
     groupOffs.read(audReader);
 
-    mkdir("AUDIO", 0755);
+    mkdir(dirRoot, 0755);
     for (atUint32 i=0 ; i<groupOffs.count ; ++i)
     {
         GroupHead head;
@@ -67,7 +75,7 @@ static void parseAudData(const FootEntryCommon& entry,
         head.read(audReader);
 
         char dirName[64];
-        snprintf(dirName, 64, "AUDIO/%03d", i);
+        snprintf(dirName, 64, "%s/%03d", dirRoot, i);
         mkdir(dirName, 0755);
 
         std::vector<SDirA> sdirA;
@@ -217,7 +225,7 @@ int main(int argc, char* argv[])
         dat.read(datReader);
         for (const SR2_DAT::FootEntry& entry : dat.footEntries)
             if (!entry.name.compare("data"))
-                parseAudData(entry.common, datReader);
+                parseAudData(entry.common, datReader, "AUDIO_RS2");
     }
     else if (rel == 3)
     {
@@ -226,7 +234,7 @@ int main(int argc, char* argv[])
         dat.read(datReader);
         for (const SR3_DAT::FootEntry& entry : dat.footEntries)
             if (!entry.name.compare("data"))
-                parseAudData(entry.common, datReader);
+                parseAudData(entry.common, datReader, "AUDIO_RS3");
     }
 
     return 0;

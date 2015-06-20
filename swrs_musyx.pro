@@ -4,8 +4,10 @@ CONFIG -= app_bundle
 CONFIG -= qt
 QT =
 
+unix {
 CONFIG += link_pkgconfig
 PKGCONFIG += libAthena
+}
 #dnaTarget.target = DNA_dat.cpp
 #dnaTarget.depends = $$PWD/DNA_dat.hpp
 #dnaTarget.commands = atdna -o DNA_dat.cpp $$PWD/DNA_dat.hpp
