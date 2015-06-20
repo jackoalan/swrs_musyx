@@ -257,41 +257,41 @@ void SDirB::read(Athena::io::IStreamReader& reader)
     /* loopPS */
     loopPS = reader.readUByte();
     /* hist1 */
-    hist1 = reader.readUint16();
+    hist1 = reader.readInt16();
     /* hist2 */
-    hist2 = reader.readUint16();
+    hist2 = reader.readInt16();
     /* coefs[0] */
-    coefs[0] = reader.readUint16();
+    coefs[0] = reader.readInt16();
     /* coefs[1] */
-    coefs[1] = reader.readUint16();
+    coefs[1] = reader.readInt16();
     /* coefs[2] */
-    coefs[2] = reader.readUint16();
+    coefs[2] = reader.readInt16();
     /* coefs[3] */
-    coefs[3] = reader.readUint16();
+    coefs[3] = reader.readInt16();
     /* coefs[4] */
-    coefs[4] = reader.readUint16();
+    coefs[4] = reader.readInt16();
     /* coefs[5] */
-    coefs[5] = reader.readUint16();
+    coefs[5] = reader.readInt16();
     /* coefs[6] */
-    coefs[6] = reader.readUint16();
+    coefs[6] = reader.readInt16();
     /* coefs[7] */
-    coefs[7] = reader.readUint16();
+    coefs[7] = reader.readInt16();
     /* coefs[8] */
-    coefs[8] = reader.readUint16();
+    coefs[8] = reader.readInt16();
     /* coefs[9] */
-    coefs[9] = reader.readUint16();
+    coefs[9] = reader.readInt16();
     /* coefs[10] */
-    coefs[10] = reader.readUint16();
+    coefs[10] = reader.readInt16();
     /* coefs[11] */
-    coefs[11] = reader.readUint16();
+    coefs[11] = reader.readInt16();
     /* coefs[12] */
-    coefs[12] = reader.readUint16();
+    coefs[12] = reader.readInt16();
     /* coefs[13] */
-    coefs[13] = reader.readUint16();
+    coefs[13] = reader.readInt16();
     /* coefs[14] */
-    coefs[14] = reader.readUint16();
+    coefs[14] = reader.readInt16();
     /* coefs[15] */
-    coefs[15] = reader.readUint16();
+    coefs[15] = reader.readInt16();
 }
 
 void SDirB::write(Athena::io::IStreamWriter& writer) const
@@ -304,40 +304,40 @@ void SDirB::write(Athena::io::IStreamWriter& writer) const
     /* loopPS */
     writer.writeUByte(loopPS);
     /* hist1 */
-    writer.writeUint16(hist1);
+    writer.writeInt16(hist1);
     /* hist2 */
-    writer.writeUint16(hist2);
+    writer.writeInt16(hist2);
     /* coefs[0] */
-    writer.writeUint16(coefs[0]);
+    writer.writeInt16(coefs[0]);
     /* coefs[1] */
-    writer.writeUint16(coefs[1]);
+    writer.writeInt16(coefs[1]);
     /* coefs[2] */
-    writer.writeUint16(coefs[2]);
+    writer.writeInt16(coefs[2]);
     /* coefs[3] */
-    writer.writeUint16(coefs[3]);
+    writer.writeInt16(coefs[3]);
     /* coefs[4] */
-    writer.writeUint16(coefs[4]);
+    writer.writeInt16(coefs[4]);
     /* coefs[5] */
-    writer.writeUint16(coefs[5]);
+    writer.writeInt16(coefs[5]);
     /* coefs[6] */
-    writer.writeUint16(coefs[6]);
+    writer.writeInt16(coefs[6]);
     /* coefs[7] */
-    writer.writeUint16(coefs[7]);
+    writer.writeInt16(coefs[7]);
     /* coefs[8] */
-    writer.writeUint16(coefs[8]);
+    writer.writeInt16(coefs[8]);
     /* coefs[9] */
-    writer.writeUint16(coefs[9]);
+    writer.writeInt16(coefs[9]);
     /* coefs[10] */
-    writer.writeUint16(coefs[10]);
+    writer.writeInt16(coefs[10]);
     /* coefs[11] */
-    writer.writeUint16(coefs[11]);
+    writer.writeInt16(coefs[11]);
     /* coefs[12] */
-    writer.writeUint16(coefs[12]);
+    writer.writeInt16(coefs[12]);
     /* coefs[13] */
-    writer.writeUint16(coefs[13]);
+    writer.writeInt16(coefs[13]);
     /* coefs[14] */
-    writer.writeUint16(coefs[14]);
+    writer.writeInt16(coefs[14]);
     /* coefs[15] */
-    writer.writeUint16(coefs[15]);
+    writer.writeInt16(coefs[15]);
 }
 

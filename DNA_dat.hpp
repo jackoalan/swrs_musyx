@@ -90,9 +90,9 @@ struct SDirB : public Athena::io::DNA<Athena::BigEndian>
     Value<atUint16> unknown1;
     Value<atUint8> initialPS;
     Value<atUint8> loopPS;
-    Value<atUint16> hist1;
-    Value<atUint16> hist2;
-    Value<atUint16> coefs[16];
+    Value<atInt16> hist1;
+    Value<atInt16> hist2;
+    Value<atInt16> coefs[16];
 };
 
 #endif // DNA_DAT_HPP
