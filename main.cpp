@@ -93,7 +93,7 @@ static void parseAudData(const FootEntryCommon& entry,
         for (const SDirA& sfx : sdirA)
         {
             atUint32 numSamples = sfx.numSamples & 0xFFFFFF;
-            atUint8 loops = sfx.numSamples >> 24;
+            bool loops = (bool)sfx.loopLengthSamples;
 
             SDirB sdirB;
             audReader.seek(head.sdirOff + sfx.SDirBOffset, Athena::Begin);
