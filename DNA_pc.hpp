@@ -21,7 +21,7 @@ struct PC_DAT : public LittleDNA
         Value<atUint16> childCount;
         String<16> name;
     };
-    Vector<FSTEntry, sizeof(fstSz / 32)> fileNodes;
+    Vector<FSTEntry, DNA_COUNT(fstSz / 32)> fileNodes;
 };
 
 struct PC_SDIREntry : public LittleDNA
