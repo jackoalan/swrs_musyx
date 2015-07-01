@@ -15,8 +15,10 @@ PKGCONFIG += libAthena
 #QMAKE_EXTRA_TARGETS += dnaTarget
 
 HEADERS += \
-    DNA_dat.hpp
+    DNA_dat.hpp \
+    DNA_pc.hpp
 
 SOURCES += \
     main.cpp \
-    DNA_dat.cpp
+    DNA_dat.cpp \
+    DNA_pc.cpp

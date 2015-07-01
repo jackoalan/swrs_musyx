@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-#include "DNA_dat.hpp"
+#include <memory>
 #include <Athena/FileReader.hpp>
 #include <Athena/MemoryReader.hpp>
-#include <memory>
+#include "DNA_dat.hpp"
+#include "DNA_pc.hpp"
 
 #if _WIN32
 #include <direct.h>
@@ -50,7 +51,7 @@ struct SamplerChunk {
     struct SampleLoop Loop;
 };
 
-static void parseAudData(const FootEntryCommon& entry,
+static void parseGCNData(const FootEntryCommon& entry,
                          Athena::io::FileReader& datReader,
                          const char* dirRoot)
 {
@@ -203,29 +204,149 @@ static void parseAudData(const FootEntryCommon& entry,
 
 }
 
+static void parsePCData(Athena::io::MemoryReader& sdir,
+                        const atUint8* sampBase,
+                        const char* dirRoot)
+{
+    mkdir(dirRoot, 0755);
+
+    std::vector<PC_SDIREntry> sdirA;
+    atUint32 word = sdir.readUint32();
+    while (word != 0xFFFFFFFF)
+    {
+        sdir.seek(-4);
+        sdirA.emplace_back();
+        sdirA.back().read(sdir);
+        word = sdir.readUint32();
+    }
+
+    for (const PC_SDIREntry& sfx : sdirA)
+    {
+        atUint32 numSamples = sfx.numSamples & 0xFFFFFF;
+        bool loops = (bool)sfx.loopLengthSamples;
+
+        char filename[128];
+        snprintf(filename, 128, "%s/SFX_%04X.wav", dirRoot, sfx.soundId);
+
+        FILE* wavef = fopen(filename, "wb");
+        fwrite("RIFF", 1, 4, wavef);
+        atUint32 dataSize = numSamples * 2;
+        atUint32 chunkSize = 36 + dataSize;
+        if (loops)
+            chunkSize += 68; /* smpl chunk */
+        fwrite(&chunkSize, 1, 4, wavef);
+        fwrite("WAVE", 1, 4, wavef);
+
+        fwrite("fmt ", 1, 4, wavef);
+        atUint32 sixteen = 16;
+        fwrite(&sixteen, 1, 4, wavef);
+        atUint16 audioFmt = 1;
+        fwrite(&audioFmt, 1, 2, wavef);
+        atUint16 chCount = 1;
+        fwrite(&chCount, 1, 2, wavef);
+        atUint32 sampRate = sfx.sampleRate;
+        fwrite(&sampRate, 1, 4, wavef);
+        atUint16 blockAlign = 2;
+        atUint32 byteRate = sampRate * blockAlign;
+        fwrite(&byteRate, 1, 4, wavef);
+        fwrite(&blockAlign, 1, 2, wavef);
+        atUint16 bps = 16;
+        fwrite(&bps, 1, 2, wavef);
+
+        fwrite("data", 1, 4, wavef);
+        fwrite(&dataSize, 1, 4, wavef);
+
+        const atInt16* pcmBlock = (atInt16*)(sampBase + sfx.audioOffset);
+        fwrite(pcmBlock, 2, numSamples, wavef);
+
+        if (loops) {
+
+            /* Build smpl chunk */
+            struct SamplerChunk smpl = {
+                {{}},
+                60,
+                0,
+                0,
+                1000000000 / (atUint32)sfx.sampleRate,
+                60, /* Middle C */
+                0,
+                0,
+                0,
+                1,
+                0,
+                {
+                    0x00020000,
+                    0,
+                    sfx.loopStartSample,
+                    sfx.loopStartSample + sfx.loopLengthSamples - 1,
+                    0,
+                    0
+                }
+            };
+            memcpy(smpl.idname, "smpl", 4);
+
+            fwrite(&smpl, 1, sizeof(smpl), wavef);
+
+        }
+
+        fclose(wavef);
+
+    }
+
+}
+
 int main(int argc, char* argv[])
 {
     if (argc < 3)
     {
-        fprintf(stderr, "Usage: swrs_extract <game-num (2 or 3)> <dat-file>\n");
+        fprintf(stderr, "Usage: swrs_extract <game-num (1,2,3)> <dat-file>\n");
         return -1;
     }
 
     int rel = atoi(argv[1]);
-    if (rel != 2 && rel != 3)
+    if (rel != 1 && rel != 2 && rel != 3)
     {
-        fprintf(stderr, "Bad game-num\nUsage: swrs_extract <game-num (2 or 3)> <dat-file>\n");
+        fprintf(stderr, "Bad game-num\nUsage: swrs_extract <game-num (1,2,3)> <dat-file>\n");
         return -1;
     }
 
-    if (rel == 2)
+    if (rel == 1)
+    {
+        PC_DAT dat;
+        Athena::io::FileReader datReader(argv[2]);
+        dat.read(datReader);
+        atUint32 sdirLen = 0;
+        std::unique_ptr<atUint8[]> sdir;
+        atUint32 sampLen = 0;
+        std::unique_ptr<atUint8[]> samp;
+        for (const PC_DAT::FSTEntry& entry : dat.fileNodes)
+        {
+            if (!entry.name.compare("sdir_SND"))
+            {
+                sdir.reset(new atUint8[entry.size]);
+                datReader.seek(entry.offset, Athena::Begin);
+                datReader.readUBytesToBuf(sdir.get(), entry.size);
+                sdirLen = entry.size;
+            }
+            else if (!entry.name.compare("samp_SND"))
+            {
+                samp.reset(new atUint8[entry.size]);
+                datReader.seek(entry.offset, Athena::Begin);
+                datReader.readUBytesToBuf(samp.get(), entry.size);
+                sampLen = entry.size;
+            }
+        }
+        Athena::io::MemoryReader sdirReader(sdir.get(), sdirLen);
+        parsePCData(sdirReader, samp.get(), "AUDIO_PC");
+    }
+    else if (rel == 2)
     {
         SR2_DAT dat;
         Athena::io::FileReader datReader(argv[2]);
         dat.read(datReader);
         for (const SR2_DAT::FootEntry& entry : dat.footEntries)
             if (!entry.name.compare("data"))
-                parseAudData(entry.common, datReader, "AUDIO_RS2");
+                parseGCNData(entry.common, datReader, "AUDIO_RS2");
     }
     else if (rel == 3)
     {
@@ -234,7 +355,7 @@ int main(int argc, char* argv[])
         dat.read(datReader);
         for (const SR3_DAT::FootEntry& entry : dat.footEntries)
             if (!entry.name.compare("data"))
-                parseAudData(entry.common, datReader, "AUDIO_RS3");
+                parseGCNData(entry.common, datReader, "AUDIO_RS3");
     }
 
     return 0;
