@@ -4,14 +4,14 @@
 #include <Athena/DNA.hpp>
 typedef Athena::io::DNA<Athena::LittleEndian> LittleDNA;
 
-struct PC_DAT : public LittleDNA
+struct PC_DAT : LittleDNA
 {
     DECL_DNA
     Value<atUint32> fstOff;
     Value<atUint32> fstSz;
     Seek<DNA_COUNT(fstOff), Athena::Begin> seekToFST;
 
-    struct FSTEntry : public LittleDNA
+    struct FSTEntry : LittleDNA
     {
         DECL_DNA
         Value<atUint32> offset;
@@ -24,7 +24,7 @@ struct PC_DAT : public LittleDNA
     Vector<FSTEntry, DNA_COUNT(fstSz / 32)> fileNodes;
 };
 
-struct PC_SDIREntry : public LittleDNA
+struct PC_SDIREntry : LittleDNA
 {
     DECL_DNA
     Value<atUint16> soundId;

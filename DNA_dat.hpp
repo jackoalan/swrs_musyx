@@ -2,8 +2,9 @@
 #define DNA_DAT_HPP
 
 #include <Athena/DNA.hpp>
+typedef Athena::io::DNA<Athena::BigEndian> BigDNA;
 
-struct FootEntryCommon : public Athena::io::DNA<Athena::BigEndian>
+struct FootEntryCommon : BigDNA
 {
     DECL_DNA
     Value<atUint64> offset;
@@ -12,7 +13,7 @@ struct FootEntryCommon : public Athena::io::DNA<Athena::BigEndian>
     Value<atUint64> loadFlags;
 };
 
-struct SR2_DAT : public Athena::io::DNA<Athena::BigEndian>
+struct SR2_DAT : BigDNA
 {
     DECL_DNA
     Value<atUint64> footOff;
@@ -20,7 +21,7 @@ struct SR2_DAT : public Athena::io::DNA<Athena::BigEndian>
 
     Seek<DNA_COUNT(footOff), Athena::Begin> footSeek;
 
-    struct FootEntry : public Athena::io::DNA<Athena::BigEndian>
+    struct FootEntry : BigDNA
     {
         DECL_DNA
         FootEntryCommon common;
@@ -30,7 +31,7 @@ struct SR2_DAT : public Athena::io::DNA<Athena::BigEndian>
     Vector<FootEntry, DNA_COUNT(footSz / 64)> footEntries;
 };
 
-struct SR3_DAT : public Athena::io::DNA<Athena::BigEndian>
+struct SR3_DAT : BigDNA
 {
     DECL_DNA
     Value<atUint64> footOff;
@@ -38,7 +39,7 @@ struct SR3_DAT : public Athena::io::DNA<Athena::BigEndian>
 
     Seek<DNA_COUNT(footOff), Athena::Begin> footSeek;
 
-    struct FootEntry : public Athena::io::DNA<Athena::BigEndian>
+    struct FootEntry : BigDNA
     {
         DECL_DNA
         FootEntryCommon common;
@@ -48,14 +49,14 @@ struct SR3_DAT : public Athena::io::DNA<Athena::BigEndian>
     Vector<FootEntry, DNA_COUNT(footSz / 160)> footEntries;
 };
 
-struct GroupOffsets : public Athena::io::DNA<Athena::BigEndian>
+struct GroupOffsets : BigDNA
 {
     DECL_DNA
     Value<atUint32> count;
     Vector<atUint32, DNA_COUNT(count)> elements;
 };
 
-struct GroupHead : public Athena::io::DNA<Athena::BigEndian>
+struct GroupHead : BigDNA
 {
     DECL_DNA
     Value<atUint32> poolOff;
@@ -68,7 +69,7 @@ struct GroupHead : public Athena::io::DNA<Athena::BigEndian>
     Value<atUint32> sampLen;
 };
 
-struct SDirA : public Athena::io::DNA<Athena::BigEndian>
+struct SDirA : BigDNA
 {
     DECL_DNA
     Value<atUint16> soundId;
@@ -84,7 +85,7 @@ struct SDirA : public Athena::io::DNA<Athena::BigEndian>
     Value<atUint32> SDirBOffset;
 };
 
-struct SDirB : public Athena::io::DNA<Athena::BigEndian>
+struct SDirB : BigDNA
 {
     DECL_DNA
     Value<atUint16> unknown1;
